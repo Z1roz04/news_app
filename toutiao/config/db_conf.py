@@ -9,11 +9,12 @@ DB_PASSWORD=os.getenv("DB_PASSWORD","zh123456")
 DB_HOST=os.getenv("DB_HOST","localhost")
 DB_PORT=os.getenv("DB_PORT","3306")
 DB_NAME=os.getenv("DB_NAME","news_app")
+DB_ECHO=os.getenv("DB_ECHO","false").lower()=="true"
 ASYNC_DATABASE_URL=f"mysql+aiomysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}?charset=utf8mb4"
 
 async_engine=create_async_engine(
     url=ASYNC_DATABASE_URL,
-    echo=True,
+    echo=DB_ECHO,
     pool_size=10,
     max_overflow=20
 )

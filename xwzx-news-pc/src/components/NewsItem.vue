@@ -2,8 +2,8 @@
   <div class="news-item" :class="{ featured }" @click="goToDetail">
     <div class="news-content">
       <h3 class="news-title">{{ news.title }}</h3>
-      <p v-if="!featured" class="news-desc">{{ news.description }}</p>
-      <div v-if="!featured" class="news-info">
+      <p class="news-desc">{{ news.description }}</p>
+      <div class="news-info">
         <span>{{ news.author }}</span>
         <span>{{ news.publishTime }}</span>
         <span>{{ news.views }} 阅读</span>
@@ -40,89 +40,74 @@ const goToDetail = () => {
 <style scoped>
 .news-item {
   display: flex;
-  padding: 12px 16px;
-  border-bottom: 1px solid #f2f2f2;
-  background-color: #fff;
+  padding: 15px;
+  margin-bottom: 10px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
   cursor: pointer;
 }
-
 .news-content {
   flex: 1;
-  margin-right: 12px;
-  overflow: hidden;
+  margin-right: 15px;
 }
-
 .news-title {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 500;
-  margin: 0 0 8px;
-  line-height: 1.4;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  color: #303133;
+  margin-bottom: 10px;
 }
-
 .news-desc {
   font-size: 14px;
-  color: #666;
-  margin: 0 0 8px;
-  line-height: 1.4;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  color: #606266;
+  margin-bottom: 10px;
 }
-
 .news-info {
   font-size: 12px;
-  color: #999;
+  color: #909399;
   display: flex;
+  gap: 15px;
 }
-
-.news-info span {
-  margin-right: 10px;
-}
-
 .news-image {
-  width: 110px;
-  height: 80px;
-  flex-shrink: 0;
+  width: 140px;
+  height: 100px;
 }
-
 .news-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
 .news-item.featured {
-  display: block;
-  padding: 12px;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  padding: 16px;
 }
 
 .news-item.featured .news-content {
   margin-right: 0;
+  margin-left: 16px;
 }
 
 .news-item.featured .news-title {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 700;
-  margin-bottom: 0;
+  margin-bottom: 10px;
+  line-height: 1.5;
 }
 
 .news-item.featured .news-image {
-  width: 100%;
+  width: 52%;
   height: auto;
-  margin-bottom: 10px;
+  flex-shrink: 0;
 }
 
 .news-item.featured .news-image img {
   width: 100%;
-  aspect-ratio: 16 / 9;
+  height: 100%;
+  aspect-ratio: 4 / 3;
   object-fit: cover;
   border-radius: 8px;
 }

@@ -11,7 +11,8 @@ export const useNewsStore = defineStore('news', {
     loading: false,
     refreshing: false,
     finished: false,
-    categoriesLoading: false
+    categoriesLoading: false,
+    searchTotal: 0,
   }),
   
   actions: {
@@ -66,7 +67,7 @@ export const useNewsStore = defineStore('news', {
         const params = {
           categoryId: this.currentCategory,
           page: isRefresh ? 1 : Math.ceil(this.newsList.length / 10) + 1,
-          pageSize: 10
+          pagesize: 10,
         }
         
         const response = await axios.get(`${apiConfig.baseURL}/api/news/list`, { params });
@@ -78,7 +79,7 @@ export const useNewsStore = defineStore('news', {
           this.newsList = isRefresh ? newsData : [...this.newsList, ...newsData];
           
           // 判断是否加载完成
-          if (newsData.length < params.pageSize) {
+          if (newsData.length < params.pagesize) {
             this.finished = true;
           }
         }
@@ -112,10 +113,9 @@ export const useNewsStore = defineStore('news', {
 
       } catch (error) {
         console.error('获取新闻详情失败:', error);
-        // 接口失败时使用模拟数据作为备选
-      } 
-        // 查找已有列表中的新闻
-},
+      }
+    },
+
     // 切换新闻分类
     changeCategory(categoryId) {
       if (this.currentCategory !== categoryId) {
@@ -130,6 +130,55 @@ export const useNewsStore = defineStore('news', {
     getCategoryName(categoryId) {
       const category = this.categories.find(item => item.id === categoryId)
       return category ? category.name : '未知'
-    }
+    },
+
+    async getNewsSearch(keyword, isRefresh = false) {
+      if (!keyword || !String(keyword).trim()) return
+
+      if (isRefresh) {
+        this.refreshing = true
+        this.newsList = []
+        this.finished = false
+        this.searchTotal = 0
+      }
+
+      this.loading = true
+
+      const pagesize = 10
+      const params = {
+        q: String(keyword).trim(),
+        page: isRefresh ? 1 : Math.ceil(this.newsList.length / pagesize) + 1,
+        pagesize,
+      }
+
+      try {
+        const response = await axios.get(`${apiConfig.baseURL}/api/news/search`, {
+          params,
+        })
+
+        if (response.data && response.data.code === 200) {
+          const raw = response.data.data
+          const newsData = Array.isArray(raw) ? raw : raw?.list ?? []
+          const total =
+            raw && typeof raw === 'object' && !Array.isArray(raw) && raw.total != null
+              ? Number(raw.total)
+              : newsData.length
+
+          this.newsList = isRefresh ? newsData : [...this.newsList, ...newsData]
+          if (isRefresh) {
+            this.searchTotal = total
+          }
+
+          if (newsData.length < pagesize) {
+            this.finished = true
+          }
+        }
+      } catch (error) {
+        console.error('搜索新闻失败:', error)
+      } finally {
+        this.loading = false
+        this.refreshing = false
+      }
+    },
   }
 })

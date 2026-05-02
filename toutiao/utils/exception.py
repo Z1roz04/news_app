@@ -1,10 +1,24 @@
 from fastapi import HTTPException,Request
+from fastapi.exceptions import RequestValidationError
 from sqlalchemy.exc import IntegrityError,SQLAlchemyError
 from starlette.responses import JSONResponse
 from starlette import status
 import traceback
 
 DEBUG_MODE=True
+
+async def request_validation_handler(request:Request,exc:RequestValidationError):
+    errs=exc.errors()
+    parts=[]
+    for e in errs[:5]:
+        loc=[str(x) for x in e.get("loc",()) if x not in ("body",)]
+        field=loc[-1] if loc else "参数"
+        parts.append(f"{field}: {e.get('msg','无效')}")
+    msg="; ".join(parts) if parts else "请求参数无效"
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content={"code":422,"message":msg,"data":None}
+    )
 
 async def http_exception_handler(request:Request,exc:HTTPException):
     return JSONResponse(

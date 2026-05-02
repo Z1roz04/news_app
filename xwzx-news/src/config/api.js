@@ -1,6 +1,5 @@
 /**
- * API配置文件
- * 包含API基础URL和AI问答功能所需的API参数
+ * API 配置：前端只连自有后端，第三方 AI Key 放在后端环境变量中。
  */
 
 // API基础URL配置
@@ -9,13 +8,3 @@ export const apiConfig = {
   baseURL: 'http://127.0.0.1:8000',
 }
 
-export const aiChatConfig = {
-  // DeepSeek API地址
-  apiEndpoint: 'https://api.deepseek.com/v1/chat/completions',
-  
-  // API Key (在此处填写你的 DeepSeek API Key)
-  apiKey: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-  
-  // 使用的模型
-  model: 'deepseek-chat'
-}

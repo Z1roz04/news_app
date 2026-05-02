@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import DateTime, func, Integer, String, Index, Text, ForeignKey, Enum
+from sqlalchemy import DateTime, Integer, String, ForeignKey, Enum
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -13,13 +13,10 @@ class Base(DeclarativeBase):
 
 class User(Base):
     __tablename__ = "user"
-    __table_args__ = (
-        Index('username_UNIQUE', 'username'),
-        Index('phone_UNIQUE', 'phone')
-    )
+    __table_args__ = ()
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True, comment="用户ID")
-    username: Mapped[str] = mapped_column(String(50), nullable=False, comment="用户名")
+    username: Mapped[str] = mapped_column(String(50), unique=True, nullable=False, comment="用户名")
     password: Mapped[str] = mapped_column(String(255), comment="密码(加密存储)")
     nickname: Mapped[Optional[str]] = mapped_column(String(50), comment="昵称")
     avatar: Mapped[Optional[str]] = mapped_column(String(255), comment="头像URL")

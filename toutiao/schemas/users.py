@@ -1,9 +1,16 @@
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, field_validator
 from typing import Optional
 
 class UserRequest(BaseModel):
-    username:str
-    password:str
+    username: str = Field(..., min_length=1, max_length=50, description="用户名")
+    password: str = Field(..., min_length=6, max_length=128, description="密码")
+
+    @field_validator("username", "password", mode="before")
+    @classmethod
+    def strip_spaces(cls, v):
+        if isinstance(v, str):
+            return v.strip()
+        return v
 
 
 
@@ -39,5 +46,12 @@ class UserUpdateRequest(BaseModel):
     phone:str=None
 
 class UserChangePasswordRequest(BaseModel):
-    old_password:str=Field(...,alias="oldPassword",description="旧密码")
-    new_password: str = Field(..., alias="newPassword", description="新密码")
+    old_password: str = Field(..., alias="oldPassword", description="旧密码", min_length=1, max_length=128)
+    new_password: str = Field(..., alias="newPassword", description="新密码", min_length=6, max_length=128)
+
+    @field_validator("old_password", "new_password", mode="before")
+    @classmethod
+    def strip_passwords(cls, v):
+        if isinstance(v, str):
+            return v.strip()
+        return v

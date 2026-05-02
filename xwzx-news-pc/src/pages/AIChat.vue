@@ -1,12 +1,10 @@
 <template>
   <div class="ai-chat-container">
-    <van-nav-bar title="AI问答" fixed />
-    
     <div class="chat-content">
       <div class="messages-container" ref="messagesContainer">
-        <div 
-          v-for="(message, index) in messages" 
-          :key="index" 
+        <div
+          v-for="(message, index) in messages"
+          :key="index"
           :class="['message', message.role === 'user' ? 'user-message' : 'ai-message']"
         >
           <div class="message-content">
@@ -19,36 +17,33 @@
           </div>
         </div>
       </div>
-      
+
       <div class="input-container">
-        <van-field
+        <el-input
           v-model="userInput"
-          rows="1"
-          autosize
           type="textarea"
+          :rows="1"
+          autosize
           placeholder="请输入问题..."
           class="chat-input"
           @keypress.enter.prevent="sendMessage"
         />
-        <van-button 
-          type="primary" 
-          class="send-button" 
-          :disabled="isLoading || !userInput.trim()" 
+        <el-button
+          type="primary"
+          class="send-button"
+          :disabled="isLoading || !userInput.trim()"
           @click="sendMessage"
         >
           发送
-        </van-button>
+        </el-button>
       </div>
     </div>
-    
-    <tab-bar />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, nextTick, watch } from 'vue';
-import TabBar from '../components/TabBar.vue';
-import { showToast } from 'vant';
+import { ElMessage } from 'element-plus';
 import * as marked from 'marked';
 import DOMPurify from 'dompurify';
 import { apiConfig } from '../config/api';
@@ -56,7 +51,6 @@ import { useUserStore } from '../store/user';
 
 const userStore = useUserStore();
 
-// 聊天消息
 const messages = ref([
   { role: 'assistant', content: '你好！我是AI助手，有什么可以帮助你的吗？' }
 ]);
@@ -64,44 +58,35 @@ const userInput = ref('');
 const messagesContainer = ref(null);
 const isLoading = ref(false);
 
-
-
-// 格式化消息内容（支持Markdown）
 const formatMessage = (content) => {
   if (!content) return '';
-  // 使用marked解析Markdown，并用DOMPurify清理HTML
   return DOMPurify.sanitize(marked.parse(content));
 };
 
-// 发送消息
 const sendMessage = async () => {
   if (!userInput.value.trim() || isLoading.value) return;
 
   if (!userStore.token) {
-    showToast('请先登录后再使用 AI 问答');
+    ElMessage.warning('请先登录后再使用 AI 问答');
     return;
   }
 
-  // 添加用户消息
   const userMessage = userInput.value.trim();
   messages.value.push({ role: 'user', content: userMessage });
   userInput.value = '';
-  
-  // 添加AI消息占位
+
   messages.value.push({ role: 'assistant', content: '' });
-  
-  // 滚动到底部
+
   await nextTick();
   scrollToBottom();
-  
-  // 发送请求
+
   isLoading.value = true;
   try {
     await fetchAIResponse(userMessage);
   } catch (error) {
     console.error('Error fetching AI response:', error);
-    // 更新最后一条消息为错误信息
     messages.value[messages.value.length - 1].content = `发生错误: ${error.message || '请检查网络或稍后重试'}`;
+    ElMessage.error('请求失败');
   } finally {
     isLoading.value = false;
     await nextTick();
@@ -109,7 +94,6 @@ const sendMessage = async () => {
   }
 };
 
-// 获取AI响应（走后端代理，非流式 JSON）
 const fetchAIResponse = async (userMessage) => {
   const historyForApi = messages.value
     .slice(0, -2)
@@ -146,27 +130,23 @@ const fetchAIResponse = async (userMessage) => {
 
   const reply = payload.data?.reply?.trim() || '';
   if (!reply) {
-    messages.value[messages.value.length - 1].content =
-      '抱歉，没有收到有效回复。';
+    messages.value[messages.value.length - 1].content = '抱歉，没有收到有效回复。';
     return;
   }
 
   messages.value[messages.value.length - 1].content = reply;
 };
 
-// 滚动到底部
 const scrollToBottom = () => {
   if (messagesContainer.value) {
     messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
   }
 };
 
-// 监听消息变化，自动滚动
 watch(messages, () => {
   nextTick(scrollToBottom);
 }, { deep: true });
 
-// 组件挂载时滚动到底部
 onMounted(() => {
   scrollToBottom();
 });
@@ -177,9 +157,8 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  padding-top: 46px;
-  padding-bottom: 50px;
   box-sizing: border-box;
+  background: #f7f8fa;
 }
 
 .chat-content {
@@ -187,48 +166,63 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
 }
 
 .messages-container {
   flex: 1;
   overflow-y: auto;
-  padding: 10px;
+  padding: 20px;
 }
 
 .message {
-  margin-bottom: 10px;
-  max-width: 80%;
+  margin-bottom: 16px;
+  max-width: 75%;
+  display: flex;
 }
 
 .user-message {
   margin-left: auto;
+  justify-content: flex-end;
 }
 
 .ai-message {
   margin-right: auto;
+  justify-content: flex-start;
 }
 
 .message-content {
-  padding: 10px;
-  border-radius: 10px;
+  padding: 12px 16px;
+  border-radius: 14px;
   word-break: break-word;
+  font-size: 15px;
+  line-height: 1.6;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
 .user-message .message-content {
-  background-color: #007aff;
+  background-color: #1677ff;
   color: white;
+  border-bottom-right-radius: 4px;
 }
 
 .ai-message .message-content {
-  background-color: #f2f2f2;
+  background-color: #fff;
   color: #333;
+  border: 1px solid #eee;
+  border-bottom-left-radius: 4px;
 }
 
 .input-container {
   display: flex;
-  padding: 10px;
+  padding: 12px 16px;
   border-top: 1px solid #eee;
   background-color: #fff;
+  border-radius: 12px;
+  margin: 0 20px 10px;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.03);
 }
 
 .chat-input {
@@ -238,46 +232,51 @@ onMounted(() => {
 
 .send-button {
   align-self: flex-end;
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 10px;
 }
 
-/* Markdown 样式 */
 .message-content pre {
-  background-color: #f8f8f8;
-  padding: 10px;
-  border-radius: 5px;
+  background-color: #f9fafb;
+  padding: 12px;
+  border-radius: 8px;
   overflow-x: auto;
+  margin: 8px 0;
+  border: 1px solid #eee;
 }
 
 .message-content code {
-  background-color: rgba(0, 0, 0, 0.05);
-  padding: 2px 4px;
-  border-radius: 3px;
+  background-color: #f2f4f6;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 14px;
 }
 
 .message-content img {
   max-width: 100%;
+  border-radius: 6px;
+  margin: 6px 0;
 }
 
-/* 打字指示器 */
 .typing-indicator {
   display: flex;
-  padding: 5px;
+  padding: 4px 0;
+  align-items: center;
 }
 
 .typing-indicator span {
-  height: 8px;
-  width: 8px;
-  background-color: #999;
+  height: 7px;
+  width: 7px;
+  background-color: #bbb;
   border-radius: 50%;
   margin: 0 2px;
-  display: inline-block;
-  animation: bounce 1.5s infinite ease-in-out;
+  animation: bounce 1.4s infinite ease-in-out;
 }
 
 .typing-indicator span:nth-child(2) {
   animation-delay: 0.2s;
 }
-
 .typing-indicator span:nth-child(3) {
   animation-delay: 0.4s;
 }
@@ -287,35 +286,12 @@ onMounted(() => {
     transform: translateY(0);
   }
   30% {
-    transform: translateY(-5px);
+    transform: translateY(-6px);
   }
 }
 
-/* Markdown样式 */
-:deep(pre) {
-  background-color: #f0f0f0;
-  padding: 10px;
-  border-radius: 4px;
-  overflow-x: auto;
-}
-
-:deep(code) {
-  font-family: monospace;
-  background-color: #f0f0f0;
-  padding: 2px 4px;
-  border-radius: 4px;
-}
-
-:deep(p) {
-  margin: 8px 0;
-}
-
-:deep(ul), :deep(ol) {
-  padding-left: 20px;
-}
-
-:deep(a) {
-  color: #1989fa;
-  text-decoration: none;
-}
+:deep(p) { margin: 6px 0; }
+:deep(ul), :deep(ol) { padding-left: 20px; margin: 6px 0; }
+:deep(a) { color: #1677ff; }
+:deep(h1),:deep(h2),:deep(h3),:deep(h4) { margin: 10px 0 6px; line-height: 1.4; }
 </style>

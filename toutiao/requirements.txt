@@ -6,3 +6,7 @@ pydantic
 passlib[bcrypt]
 redis
 python-dotenv
+httpx
+langchain
+langchain-core
+langchain-openai

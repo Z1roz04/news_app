@@ -24,10 +24,11 @@
               :finished-text="$t('home.noMore')"
               @load="onLoad"
             >
-              <news-item 
-                v-for="item in newsStore.newsList" 
-                :key="item.id" 
-                :news="item" 
+              <news-item
+                v-for="(item, index) in newsStore.newsList"
+                :key="item.id"
+                :news="item"
+                :featured="index === 0"
               />
             </van-list>
           </van-pull-refresh>

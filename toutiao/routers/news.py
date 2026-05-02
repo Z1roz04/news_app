@@ -3,6 +3,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from config.db_conf import get_db
 from crud import news,news_cache
 
+from utils.response import success_response
+
 # 创建APIRouter实例
 router=APIRouter(prefix="/api/news",tags=["news"])
 
@@ -64,3 +66,24 @@ async def get_news_detail(news_id:int=Query(...,alias="id"),db:AsyncSession=Depe
             "relatedNews":related_news
         }
     }
+
+@router.get("/search")
+async def get_news_search(
+        q:str,
+        page:int=1,
+        page_size:int=Query(default=10,alias="pagesize",le=100),
+        db:AsyncSession=Depends(get_db)):
+    offset=(page-1)*page_size
+    rows=await news.get_news_query(db,q,offset,page_size)
+    total=await news.count_news_query(db,q)
+    data_list=[{
+        "id":r.id,
+        "title":r.title,
+        "description":r.description,
+        "image":r.image,
+        "author":r.author,
+        "categoryId":r.category_id,
+        "views":r.views,
+        "publishTime":r.publish_time,
+    }for r in rows]
+    return success_response(message="查询成功",data={"list":data_list,"total":total})
