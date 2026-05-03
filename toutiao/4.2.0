@@ -1,0 +1,4 @@
+Defaulting to user installation because normal site-packages is not writeable
+Looking in indexes: https://pypi.tuna.tsinghua.edu.cn/simple
+Requirement already satisfied: redis in f:\programdata\anaconda3\envs\news_app\lib\site-packages (7.0.1)
+Requirement already satisfied: async-timeout>=4.0.3 in f:\programdata\anaconda3\envs\news_app\lib\site-packages (from redis) (5.0.1)

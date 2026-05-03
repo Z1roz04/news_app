@@ -1,0 +1,27 @@
+{
+  "name": "news-platform",
+  "version": "1.0.0",
+  "description": "新闻资讯平台 - PC端 + 移动端双视图分离架构",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:mobile": "npm run dev --workspace=@news-platform/mobile",
+    "dev:pc": "npm run dev --workspace=@news-platform/pc",
+    "dev": "concurrently \"npm run dev:pc\" \"npm run dev:mobile\"",
+    "build": "npm run build --workspaces",
+    "build:mobile": "npm run build --workspace=@news-platform/mobile",
+    "build:pc": "npm run build --workspace=@news-platform/pc",
+    "install:all": "npm install --workspaces",
+    "clean": "npm run clean --workspaces --if-present 2>/dev/null || true && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

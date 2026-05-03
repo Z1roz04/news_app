@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="description" content="新闻资讯平台 - 移动端" />
+    <title>新闻资讯 - 移动端</title>
+    <!-- 设备识别：如果不是移动端，提示跳转到 PC 端 -->
+    <script>
+      (function() {
+        // 检测是否为 PC 设备
+        var ua = navigator.userAgent.toLowerCase();
+        var isMobile = /android|iphone|ipad|ipod|windows phone|mobile|mobi/.test(ua);
+        var isTablet = /ipad|android(?!.*mobile)|tablet/.test(ua);
+        
+        // 如果是 PC 设备且当前不是强制移动端模式
+        if (!isMobile && !isTablet && !window.location.search.includes('force=mobile')) {
+          // 检查是否已在 PC 端路径
+          if (!window.location.pathname.startsWith('/pc')) {
+            // 跳转到 PC 端（假设 PC 端在 /pc 路径）
+            var pcUrl = '/pc' + window.location.pathname + window.location.search;
+            // 如果配置了子域名，可以跳转到子域名
+            // var pcUrl = 'https://www.news.example.com' + window.location.pathname;
+            console.log('PC 设备检测到，建议访问 PC 端:', pcUrl);
+            // 取消注释以下行以启用自动跳转
+            // window.location.href = pcUrl;
+          }
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
